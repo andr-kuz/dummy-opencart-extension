@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modification>
+   <name>Баннер в шапке</name>
+   <code>header_banner</code>
+   <version>1.0</version>
+   <author>opencart2x.ru</author>
+   <link>https://opencart2x.ru</link>
+   <file path="catalog/view/theme/*/template/components/header/catalog.tpl">
+      <operation error="log">
+         <search>
+            <![CDATA[<div class="header-banner"></div>]]>
+         </search>
+         <add position="replace">
+            <![CDATA[
+		<div class="header-banner">
+			<?php foreach($banners as $banner) { ?>
+				<img src="<?=$banner['link'] ?>" alt="<?=$banner['title'] ?>">
+			<?php } ?>
+		</div>
+		<script>
+		    $('.header-banner').slick({
+			slidesToShow: 1,
+			slidesToScroll: 1,
+			infinite: true,
+			dots: false,
+			arrows: false,
+			autoplay: true,
+			autoplaySpeed: 2000,
+	            });
+		</script>
+            ]]>
+         </add>
+      </operation>
+   </file>
+   <file path="catalog/controller/common/header.php">
+      <operation error="log">
+         <search>
+            <![CDATA[$data['language'] = $this->load->controller('common/language');]]>
+         </search>
+         <add position="after">
+            <![CDATA[
+	        $data['banners'] = [];
+		if ($this->config->get('header_banner_status')) {
+			foreach ($this->config->get('header_banner_banner_image')  as $key => $value) {
+				foreach ($value as $banner_image) {
+					$order = $banner_image['sort_order'];
+					$data['banners'][$order] = array(
+						'title'      => $banner_image['title'],
+						'link'       => $banner_image['link'],
+						'image'      => $banner_image['image'],
+					);
+				}
+			}
+		}
+		asort($data['banners']);
+            ]]>
+         </add>
+      </operation>
+   </file>
+</modification>
